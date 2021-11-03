@@ -1,73 +1,75 @@
-const arr = []
+// connect js library to html
+import Decimal from 'decimal.js'
 
-function createLi() {
-    const li = document.createElement('li')
-    const ul = document.querySelector('#ul')
-    for (let i = 0; i < arr.length; i++) {
-        li.innerHTML = arr[i]
-        ul.append(li)
-    }
-    const arr2 = []
-    // Add all list to a new array
-    for (let i = 0; i < ul.childNodes.length; i++) {
-        arr2.push(ul.childNodes[i].innerHTML)
-    }
-    // Sort the list
-    arr2.sort()
-    ul.innerHTML = '' // если убрать этот параметр то при каждом новом добавлении элемента в список,
+// func which will detect errors in input
+function error(event) {
+    const input = event.target
+    const errorDiv = input.nextSibling
 
-    // add all arr to a new list
-    for (let j = 0; j < arr2.length; j++) {
-        const li = document.createElement('li')
-        li.innerHTML = arr2[j]
-        ul.append(li)
+    const value = Number(input.value)
+    if (!isFinite(value)) {
+        errorDiv.innerHTML = 'This is not number'
+    }
+    if (value === 0 || value) {
+        errorDiv.innerHTML = ''
+    }
+    if (input.value.includes(' ')) {
+        errorDiv.innerHTML = 'This is not number'
     }
 }
 
-function add() {
-    if (document.querySelector('.input').value.trim().length === 0) {
-        return
+// func which will be sum two arguments from inputs;
+function sum() {
+    const x = Number(document.getElementById('firstInput').value)
+    const y = Number(document.getElementById('secondInput').value)
+    if (!isFinite(x) || !isFinite(y)) {
+        document.querySelector('.result').innerHTML = 'This is not number'
+    } else {
+        document.querySelector('.result').innerHTML = Decimal.sum(x, y)
     }
-    arr.push(document.querySelector('.input').value)
-    createLi()
-    const value = JSON.stringify(arr)
-    localStorage.setItem('task', value)
-    document.querySelector('.input').value = ''
+    if (
+        document.getElementById('firstInput').value.includes(' ') ||
+        document.getElementById('secondInput').value.includes(' ')
+    ) {
+        document.querySelector('.result').innerHTML = 'This is not number'
+    }
 }
 
+// create a fucn to load HTML-elements
 function ready() {
-    const input = document.createElement('input')
-    input.classList.add('input')
-    document.body.append(input)
+    // create first input
+    const firstInput = document.createElement('input')
+    firstInput.id = 'firstInput'
+    firstInput.addEventListener('input', error)
+    document.body.append(firstInput)
 
+    // create first div for error-message
+    const firstDiv = document.createElement('div')
+    firstDiv.classList.add('error-message1')
+    document.body.append(firstDiv)
+
+    // create second input
+    const secondInput = document.createElement('Input')
+    secondInput.id = 'secondInput'
+    secondInput.addEventListener('input', error)
+    document.body.append(secondInput)
+
+    // create second div for error-message
+    const secondDiv = document.createElement('div')
+    secondDiv.setAttribute('class', 'error-message2')
+    document.body.append(secondDiv)
+
+    // create button
     const button = document.createElement('button')
-    button.textContent = 'Add'
-    button.addEventListener('click', add)
+    button.textContent = 'Count'
+    button.addEventListener('click', sum)
+    button.id = 'button'
     document.body.append(button)
 
-    const div = document.createElement('div')
-    div.id = 'container'
-    document.body.append(div)
-
-    const ul = document.createElement('ul')
-    ul.id = 'ul'
-    document.querySelector('#container').append(ul)
-
-    document.querySelector('.input').onkeydown = function key(event) {
-        if (event.keyCode === 13) {
-            add()
-        }
-    }
-    if (!localStorage.getItem('task')) {
-        return arr
-    }
-    const value = JSON.parse(localStorage.getItem('task'))
-    for (let i = 0; i < value.length; i++) {
-        const li = document.createElement('li')
-        li.innerHTML = value[i]
-        document.querySelector('#ul').append(li)
-    }
-    return ''
+    // create third div for result
+    const thirdDiv = document.createElement('div')
+    thirdDiv.setAttribute('class', 'result')
+    document.body.append(thirdDiv)
 }
 
-window.addEventListener('load', ready)
+window.addEventListener('DOMContentLoaded', ready)
